@@ -1,0 +1,79 @@
+Company Internal Policies Manual
+
+1. Code of Conduct
+
+1.1 Professional Behavior
+• Maintain respectful communication with all employees.
+• Avoid abusive or discriminatory language.
+• Consequence: First violation: Written warning
+• Consequence: Repeated violations: Suspension up to 5 days
+• Consequence: Severe misconduct: Termination
+
+1.2 Integrity and Ethics
+• Disclose conflicts of interest.
+• Do not engage in bribery or corruption.
+• Consequence: Immediate investigation
+• Consequence: Possible termination and legal action
+
+2. Attendance and Working Hours
+
+2.1 Working Hours
+• Standard working hours: 9 hours per day.
+• Core availability: 10 AM – 5 PM.
+• Consequence: Non-compliance: Salary deduction
+• Consequence: Repeated issue: Performance warning
+
+2.2 Attendance
+• More than 3 unapproved absences in a month is unacceptable.
+• Late login beyond 30 minutes more than 5 times/month is a violation.
+• Consequence: Warning after threshold breach
+• Consequence: Leave deduction
+• Consequence: Escalation to HR
+
+3. Data Security
+
+3.1 Confidential Data Handling
+• Do not share company data externally.
+• Use only approved storage systems.
+• Consequence: Immediate access revocation
+• Consequence: Termination
+• Consequence: Legal proceedings if breach is severe
+
+4. Use of Company Assets
+
+4.1 Acceptable Use
+• Devices must be used only for work.
+• Unauthorized software installation is prohibited.
+• Consequence: Device access restriction
+• Consequence: IT disciplinary action
+
+5. Anti-Harassment Policy
+5.1 Workplace Harassment
+• Includes verbal, physical, or online harassment.
+• Applies to all employees and stakeholders.
+• Consequence: Immediate suspension during investigation
+• Consequence: Termination upon confirmation
+• Consequence: Legal reporting if required
+
+6. Leave Policy
+6.1 Leave Limits
+• Casual Leave: 12 days/year
+• Sick Leave: 10 days/year
+• Earned Leave: 15 days/year
+• Consequence: Excess leave: Salary deduction
+• Consequence: Unauthorized leave: Disciplinary action
+
+7. Disciplinary Actions Framework
+7.1 Escalation Levels
+• Level 1: Verbal Warning
+• Level 2: Written Warning
+• Level 3: Suspension
+• Level 4: Termination
+• Consequence: Actions depend on severity and repetition
+
+8. Compliance
+8.1 Legal and Policy Compliance
+• Employees must follow all applicable laws.
+• Mandatory policy acknowledgment annually.
+• Consequence: Non-compliance may lead to termination
+• Consequence: Legal liability where applicable
