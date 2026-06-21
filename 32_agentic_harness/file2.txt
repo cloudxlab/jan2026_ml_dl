@@ -1,0 +1,1 @@
+Individual users have limits between 2000-5000 based on the credit score. refer to file4.txt
