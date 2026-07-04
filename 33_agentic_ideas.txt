@@ -1,0 +1,39 @@
+https://github.com/terno-ai/agentic
+
+In one word, describe how is the world and everything created.
+
+Problem: Too many documents 
+    Sol: RAG (Search and build a small prompt)
+    Problem: Could not do multistep thinking 
+    Problem: Could not ask clarifying questions
+    Problem: Could not reference multiple sources in order to answer questions
+    Problem: Hallucinating
+        Soln: Agentic Harness
+        Problem1: What if the conversation becomes too long. It would overflow the context?
+            Soln1: Context compressiontask_details. If the context is >= 80% of the max allowed. ask llm to summarize.
+                Problem: We lose accuracy.
+            Soln2:
+                LaunchAnotherAgent "Create Test Cases. Detailed description about the project"
+                Problem: First agent is keep on hold.
+        Problem2: How to learn from conversation with users?
+            Soln: Save it somewhere
+                Q1: When will you save it?
+                    A: Create a tool called memory_save, 
+                Q2: How and when will you use it?
+                    A: just like RAG as well as we can have a tool READ_MEMORY
+
+
+# classs Agent:
+#     def answer(question):
+#         for _ in range(100):
+#             action = llm(prompt.replace(question))
+#             if action.name == "LaunchAnotherAgent":
+#                 task_details = action.value
+#                 new_agent = Agent()
+#                 context += new_agent.answer(task_details)
+#             if action.name == "READFILE":
+#                 pass 
+#             if action.name == "Python":
+#                 pass
+
+
