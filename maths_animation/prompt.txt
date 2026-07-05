@@ -1,0 +1,1 @@
+Install manim and using manim create a video showing the detailed process of adding two numbers digit by digit.
