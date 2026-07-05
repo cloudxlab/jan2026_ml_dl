@@ -1,0 +1,2250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Learning by Inventing — RAG & Agentic AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&family=Lora:ital,wght@0,500;1,400&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/bash.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --ink: #1a1a1a;
+    --ink-2: #4a4a4a;
+    --ink-3: #8a8a8a;
+    --paper: #fafaf8;
+    --paper-2: #f2f1ee;
+    --paper-3: #e8e7e3;
+    --rule: #dddbd6;
+    --accent: #2d5be3;
+    --accent-bg: #eef2fd;
+    --success: #1a7f4e;
+    --success-bg: #eaf5f0;
+    --warn: #a05c00;
+    --warn-bg: #fef7ed;
+    --danger: #c0392b;
+    --sidebar-w: 280px;
+    --mono: 'JetBrains Mono', monospace;
+    --sans: 'Inter', sans-serif;
+    --serif: 'Lora', serif;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: var(--sans);
+    background: var(--paper);
+    color: var(--ink);
+    display: flex;
+    min-height: 100vh;
+    font-size: 15px;
+    line-height: 1.7;
+  }
+
+  /* ── Sidebar ── */
+  #sidebar {
+    width: var(--sidebar-w);
+    min-width: var(--sidebar-w);
+    background: var(--paper-2);
+    border-right: 1px solid var(--rule);
+    height: 100vh;
+    position: sticky;
+    top: 0;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+  }
+
+  .sidebar-header {
+    padding: 24px 20px 16px;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .sidebar-logo {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 13px;
+    color: var(--ink-3);
+    letter-spacing: 0.02em;
+    margin-bottom: 4px;
+  }
+
+  .sidebar-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--ink);
+    line-height: 1.3;
+  }
+
+  .progress-bar-wrap {
+    margin-top: 12px;
+    background: var(--paper-3);
+    border-radius: 3px;
+    height: 4px;
+    overflow: hidden;
+  }
+
+  .progress-bar-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 3px;
+    transition: width 0.4s ease;
+    width: 0%;
+  }
+
+  .progress-label {
+    font-size: 11px;
+    color: var(--ink-3);
+    margin-top: 5px;
+  }
+
+  .nav-section {
+    padding: 8px 0;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .nav-section:last-child { border-bottom: none; }
+
+  .nav-module-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    padding: 10px 20px 6px;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 7px 20px;
+    cursor: pointer;
+    border-left: 3px solid transparent;
+    transition: all 0.15s;
+    text-decoration: none;
+    color: var(--ink-2);
+    font-size: 13px;
+  }
+
+  .nav-item:hover {
+    background: var(--paper-3);
+    color: var(--ink);
+  }
+
+  .nav-item.active {
+    border-left-color: var(--accent);
+    background: var(--accent-bg);
+    color: var(--accent);
+    font-weight: 500;
+  }
+
+  .nav-item.done .nav-check { color: var(--success); }
+
+  .nav-check {
+    width: 16px;
+    height: 16px;
+    border: 1.5px solid var(--rule);
+    border-radius: 50%;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 9px;
+    color: transparent;
+    background: var(--paper);
+    transition: all 0.2s;
+  }
+
+  .nav-item.done .nav-check {
+    background: var(--success-bg);
+    border-color: var(--success);
+    color: var(--success);
+  }
+
+  .nav-stars {
+    margin-left: auto;
+    font-size: 9px;
+    letter-spacing: -1px;
+    color: var(--ink-3);
+    flex-shrink: 0;
+  }
+
+  /* ── Main content ── */
+  #main {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .top-bar {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: var(--paper);
+    border-bottom: 1px solid var(--rule);
+    padding: 0 48px;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .top-bar-breadcrumb {
+    font-size: 13px;
+    color: var(--ink-3);
+  }
+
+  .top-bar-breadcrumb span { color: var(--ink-2); }
+
+  .top-bar-actions { display: flex; gap: 8px; }
+
+  .btn {
+    font-family: var(--sans);
+    font-size: 12px;
+    padding: 5px 12px;
+    border-radius: 6px;
+    border: 1px solid var(--rule);
+    background: var(--paper);
+    color: var(--ink-2);
+    cursor: pointer;
+    transition: all 0.15s;
+    font-weight: 500;
+  }
+
+  .btn:hover { background: var(--paper-2); color: var(--ink); border-color: var(--paper-3); }
+  .btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .btn.primary:hover { background: #1e4bc7; border-color: #1e4bc7; }
+
+  /* ── Pages ── */
+  .page { display: none; }
+  .page.active { display: block; }
+
+  /* ── Home page ── */
+  .home-hero {
+    max-width: 680px;
+    margin: 64px auto 0;
+    padding: 0 48px 80px;
+  }
+
+  .home-eyebrow {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 16px;
+  }
+
+  .home-h1 {
+    font-family: var(--serif);
+    font-size: 40px;
+    font-weight: 500;
+    line-height: 1.2;
+    color: var(--ink);
+    margin-bottom: 20px;
+  }
+
+  .home-h1 em {
+    font-style: italic;
+    color: var(--ink-2);
+  }
+
+  .home-lead {
+    font-size: 16px;
+    color: var(--ink-2);
+    line-height: 1.75;
+    margin-bottom: 32px;
+    max-width: 560px;
+  }
+
+  .home-philosophy {
+    background: var(--paper-2);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 8px 8px 0;
+    padding: 20px 24px;
+    margin-bottom: 40px;
+    font-size: 14px;
+    color: var(--ink-2);
+    line-height: 1.7;
+  }
+
+  .home-philosophy strong { color: var(--ink); font-weight: 600; }
+
+  .home-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 40px;
+  }
+
+  .module-card {
+    border: 1px solid var(--rule);
+    border-radius: 10px;
+    padding: 20px;
+    background: var(--paper);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .module-card:hover {
+    border-color: var(--accent);
+    box-shadow: 0 2px 12px rgba(45, 91, 227, 0.08);
+  }
+
+  .module-card-num {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    margin-bottom: 6px;
+  }
+
+  .module-card-title {
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--ink);
+    margin-bottom: 6px;
+  }
+
+  .module-card-q {
+    font-size: 12px;
+    color: var(--ink-3);
+    font-style: italic;
+    line-height: 1.5;
+  }
+
+  .module-card-exercises {
+    margin-top: 12px;
+    font-size: 11px;
+    color: var(--ink-3);
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .ex-pill {
+    background: var(--paper-2);
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    padding: 2px 7px;
+    font-size: 11px;
+  }
+
+  .prereq-box {
+    background: var(--warn-bg);
+    border: 1px solid #f0d9b5;
+    border-radius: 8px;
+    padding: 16px 20px;
+    font-size: 13px;
+    color: var(--warn);
+    margin-bottom: 32px;
+    line-height: 1.6;
+  }
+
+  .prereq-box strong { color: #7a4500; }
+
+  .start-btn-wrap { text-align: center; padding-top: 8px; }
+
+  /* ── Exercise page ── */
+  .exercise-wrap {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 48px 48px 80px;
+  }
+
+  .ex-eyebrow {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    margin-bottom: 10px;
+  }
+
+  .ex-title {
+    font-family: var(--serif);
+    font-size: 28px;
+    font-weight: 500;
+    line-height: 1.25;
+    color: var(--ink);
+    margin-bottom: 8px;
+  }
+
+  .ex-meta {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 32px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .ex-difficulty {
+    font-size: 13px;
+    color: var(--ink-3);
+  }
+
+  .ex-difficulty .stars { letter-spacing: -1px; }
+
+  .ex-concept-tag {
+    font-size: 11px;
+    font-weight: 500;
+    background: var(--accent-bg);
+    color: var(--accent);
+    border-radius: 4px;
+    padding: 3px 9px;
+  }
+
+  /* ── Content sections ── */
+  .section {
+    margin-bottom: 32px;
+  }
+
+  .section-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--rule);
+  }
+
+  .section p {
+    color: var(--ink-2);
+    margin-bottom: 12px;
+    font-size: 15px;
+    line-height: 1.75;
+  }
+
+  .section p:last-child { margin-bottom: 0; }
+
+  .section p strong { color: var(--ink); font-weight: 600; }
+
+  .section p em { font-style: italic; }
+
+  .section ol, .section ul {
+    padding-left: 20px;
+    color: var(--ink-2);
+    margin-bottom: 12px;
+  }
+
+  .section li { margin-bottom: 4px; font-size: 15px; }
+
+  /* ── Code blocks ── */
+  .code-wrap {
+    margin: 16px 0;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid var(--rule);
+  }
+
+  .code-header {
+    background: var(--paper-2);
+    border-bottom: 1px solid var(--rule);
+    padding: 7px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .code-lang {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--ink-3);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .code-copy {
+    font-size: 11px;
+    color: var(--ink-3);
+    cursor: pointer;
+    padding: 2px 8px;
+    border-radius: 4px;
+    border: 1px solid var(--rule);
+    background: var(--paper);
+    font-family: var(--sans);
+    transition: all 0.15s;
+  }
+
+  .code-copy:hover { color: var(--ink); background: var(--paper-3); }
+  .code-copy.copied { color: var(--success); border-color: var(--success); }
+
+  .code-wrap pre {
+    margin: 0;
+    padding: 16px;
+    overflow-x: auto;
+    background: #f8f8f6;
+    font-family: var(--mono);
+    font-size: 13px;
+    line-height: 1.6;
+  }
+
+  .code-wrap pre code { background: none; padding: 0; font-size: 13px; }
+
+  /* ── Collapsible panels ── */
+  .collapsible {
+    border: 1px solid var(--rule);
+    border-radius: 8px;
+    margin: 12px 0;
+    overflow: hidden;
+  }
+
+  .collapsible.hint-panel { border-color: #c9dafe; }
+  .collapsible.solution-panel { border-color: #b8e6cf; }
+  .collapsible.reveal-panel { border-color: #ddd; background: var(--paper-2); }
+
+  .collapsible-trigger {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: var(--sans);
+    font-size: 13px;
+    font-weight: 500;
+    text-align: left;
+    transition: background 0.15s;
+  }
+
+  .hint-panel .collapsible-trigger { background: #f0f5ff; color: #2040a0; }
+  .hint-panel .collapsible-trigger:hover { background: #e4edff; }
+
+  .solution-panel .collapsible-trigger { background: #f0faf5; color: #155d38; }
+  .solution-panel .collapsible-trigger:hover { background: #e2f5eb; }
+
+  .reveal-panel .collapsible-trigger { background: var(--paper-2); color: var(--ink-2); }
+  .reveal-panel .collapsible-trigger:hover { background: var(--paper-3); }
+
+  .collapsible-icon {
+    font-size: 12px;
+    transition: transform 0.2s;
+    flex-shrink: 0;
+  }
+
+  .collapsible.open .collapsible-icon { transform: rotate(90deg); }
+
+  .collapsible-label-tag {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 2px 7px;
+    border-radius: 3px;
+  }
+
+  .hint-panel .collapsible-label-tag { background: #dce8ff; color: #1a3a99; }
+  .solution-panel .collapsible-label-tag { background: #c8edd8; color: #0e4a29; }
+  .reveal-panel .collapsible-label-tag { background: var(--paper-3); color: var(--ink-3); }
+
+  .collapsible-body {
+    display: none;
+    padding: 16px;
+    border-top: 1px solid var(--rule);
+    font-size: 14px;
+    line-height: 1.7;
+  }
+
+  .hint-panel .collapsible-body { background: #fafcff; border-top-color: #c9dafe; }
+  .solution-panel .collapsible-body { background: #f7fdf9; border-top-color: #b8e6cf; }
+  .reveal-panel .collapsible-body { background: var(--paper-2); }
+
+  .collapsible.open .collapsible-body { display: block; }
+
+  .collapsible-body p { color: var(--ink-2); margin-bottom: 10px; }
+  .collapsible-body p:last-child { margin-bottom: 0; }
+  .collapsible-body code {
+    font-family: var(--mono);
+    font-size: 12px;
+    background: var(--paper-3);
+    padding: 1px 5px;
+    border-radius: 3px;
+  }
+
+  /* ── Invented tag ── */
+  .invented-box {
+    background: linear-gradient(135deg, #f0f5ff 0%, #f5f0ff 100%);
+    border: 1px solid #c9dafe;
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin-top: 24px;
+    font-size: 14px;
+    color: var(--ink-2);
+    line-height: 1.6;
+  }
+
+  .invented-box strong { color: var(--accent); font-weight: 600; }
+
+  .invented-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 6px;
+  }
+
+  /* ── Task checklist ── */
+  .task-list { list-style: none; padding: 0; margin: 12px 0; }
+
+  .task-item {
+    display: flex;
+    gap: 10px;
+    padding: 6px 0;
+    font-size: 14px;
+    color: var(--ink-2);
+    line-height: 1.5;
+  }
+
+  .task-item::before {
+    content: '◻';
+    color: var(--ink-3);
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  /* ── Exercise nav footer ── */
+  .ex-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 48px;
+    padding-top: 24px;
+    border-top: 1px solid var(--rule);
+    gap: 16px;
+  }
+
+  .done-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: var(--ink-2);
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .done-checkbox input { cursor: pointer; width: 16px; height: 16px; }
+
+  /* ── Epilogue / summary table ── */
+  .summary-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    margin-top: 16px;
+  }
+
+  .summary-table th {
+    text-align: left;
+    padding: 8px 12px;
+    background: var(--paper-2);
+    border-bottom: 2px solid var(--rule);
+    font-weight: 600;
+    font-size: 11px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+  }
+
+  .summary-table td {
+    padding: 9px 12px;
+    border-bottom: 1px solid var(--rule);
+    color: var(--ink-2);
+    vertical-align: top;
+  }
+
+  .summary-table tr:hover td { background: var(--paper-2); }
+
+  .summary-table td:first-child {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--accent);
+    white-space: nowrap;
+  }
+
+  .summary-table td em {
+    font-style: normal;
+    font-weight: 500;
+    color: var(--ink);
+  }
+
+  /* ── Callout boxes ── */
+  .callout {
+    border-radius: 8px;
+    padding: 14px 18px;
+    font-size: 14px;
+    line-height: 1.65;
+    margin: 16px 0;
+  }
+
+  .callout.info { background: var(--accent-bg); border-left: 3px solid var(--accent); color: #1a3a99; }
+  .callout.warn { background: var(--warn-bg); border-left: 3px solid #e8a847; color: var(--warn); }
+  .callout.success { background: var(--success-bg); border-left: 3px solid var(--success); color: #0e5232; }
+
+  .callout strong { font-weight: 600; }
+
+  /* inline code */
+  code {
+    font-family: var(--mono);
+    font-size: 12.5px;
+    background: var(--paper-3);
+    padding: 1px 5px;
+    border-radius: 3px;
+    color: var(--ink);
+  }
+
+  /* ── Scrollbar ── */
+  #sidebar::-webkit-scrollbar { width: 4px; }
+  #sidebar::-webkit-scrollbar-track { background: transparent; }
+  #sidebar::-webkit-scrollbar-thumb { background: var(--rule); border-radius: 2px; }
+
+  /* ── Mobile ── */
+  @media (max-width: 700px) {
+    #sidebar { display: none; }
+    .exercise-wrap, .home-hero { padding: 24px 20px 60px; }
+    .top-bar { padding: 0 20px; }
+    .home-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════ SIDEBAR -->
+<nav id="sidebar">
+  <div class="sidebar-header">
+    <div class="sidebar-logo">Learning by Inventing</div>
+    <div class="sidebar-title">RAG &amp; Agentic AI</div>
+    <div class="progress-bar-wrap">
+      <div class="progress-bar-fill" id="progressFill"></div>
+    </div>
+    <div class="progress-label" id="progressLabel">0 of 11 exercises complete</div>
+  </div>
+
+  <div class="nav-section">
+    <a class="nav-item active" onclick="showPage('home')" href="#">
+      <div class="nav-check" id="check-home">⌂</div>
+      <span>Overview</span>
+    </a>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-module-label">Module 1 — Knowledge Gap</div>
+    <a class="nav-item" onclick="showPage('ex-1-1')" href="#">
+      <div class="nav-check" id="check-1-1">✓</div>
+      <span>1.1 — The Amnesiac Oracle</span>
+      <span class="nav-stars">★☆☆☆☆</span>
+    </a>
+    <a class="nav-item" onclick="showPage('ex-1-2')" href="#">
+      <div class="nav-check" id="check-1-2">✓</div>
+      <span>1.2 — Stuffing the Prompt</span>
+      <span class="nav-stars">★★☆☆☆</span>
+    </a>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-module-label">Module 2 — Search Problem</div>
+    <a class="nav-item" onclick="showPage('ex-2-1')" href="#">
+      <div class="nav-check" id="check-2-1">✓</div>
+      <span>2.1 — When Words Lie</span>
+      <span class="nav-stars">★★☆☆☆</span>
+    </a>
+    <a class="nav-item" onclick="showPage('ex-2-2')" href="#">
+      <div class="nav-check" id="check-2-2">✓</div>
+      <span>2.2 — Document Index</span>
+      <span class="nav-stars">★★★☆☆</span>
+    </a>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-module-label">Module 3 — Inventing RAG</div>
+    <a class="nav-item" onclick="showPage('ex-3-1')" href="#">
+      <div class="nav-check" id="check-3-1">✓</div>
+      <span>3.1 — The Grounded Answer</span>
+      <span class="nav-stars">★★★☆☆</span>
+    </a>
+    <a class="nav-item" onclick="showPage('ex-3-2')" href="#">
+      <div class="nav-check" id="check-3-2">✓</div>
+      <span>3.2 — Chunking</span>
+      <span class="nav-stars">★★★★☆</span>
+    </a>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-module-label">Module 4 — Single-Step Limit</div>
+    <a class="nav-item" onclick="showPage('ex-4-1')" href="#">
+      <div class="nav-check" id="check-4-1">✓</div>
+      <span>4.1 — Model That Cannot Act</span>
+      <span class="nav-stars">★★☆☆☆</span>
+    </a>
+    <a class="nav-item" onclick="showPage('ex-4-2')" href="#">
+      <div class="nav-check" id="check-4-2">✓</div>
+      <span>4.2 — Parsing Tool Calls</span>
+      <span class="nav-stars">★★★☆☆</span>
+    </a>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-module-label">Module 5 — Inventing Agents</div>
+    <a class="nav-item" onclick="showPage('ex-5-1')" href="#">
+      <div class="nav-check" id="check-5-1">✓</div>
+      <span>5.1 — The Reasoning Loop</span>
+      <span class="nav-stars">★★★★☆</span>
+    </a>
+    <a class="nav-item" onclick="showPage('ex-5-2')" href="#">
+      <div class="nav-check" id="check-5-2">✓</div>
+      <span>5.2 — Agent Memory</span>
+      <span class="nav-stars">★★★★☆</span>
+    </a>
+    <a class="nav-item" onclick="showPage('ex-5-3')" href="#">
+      <div class="nav-check" id="check-5-3">✓</div>
+      <span>5.3 — RAG Agent</span>
+      <span class="nav-stars">★★★★★</span>
+    </a>
+  </div>
+
+  <div class="nav-section">
+    <a class="nav-item" onclick="showPage('epilogue')" href="#">
+      <div class="nav-check" style="border-color:transparent; background:transparent; font-size:12px; color:var(--ink-3)">→</div>
+      <span>Epilogue &amp; Going Further</span>
+    </a>
+  </div>
+</nav>
+
+<!-- ═══════════════════════════════════════════════════════ MAIN -->
+<div id="main">
+  <div class="top-bar">
+    <div class="top-bar-breadcrumb" id="breadcrumb"><span>Overview</span></div>
+    <div class="top-bar-actions">
+      <button class="btn" onclick="expandAll()">Expand all</button>
+      <button class="btn" onclick="collapseAll()">Collapse all</button>
+    </div>
+  </div>
+
+  <!-- ─── HOME ─── -->
+  <div class="page active" id="page-home">
+    <div class="home-hero">
+      <div class="home-eyebrow">Learning by Inventing</div>
+      <h1 class="home-h1">RAG &amp; Agentic AI<br><em>from first principles</em></h1>
+      <p class="home-lead">You will build retrieval-augmented generation and AI agents from scratch — before either concept is named. Every exercise ends with a frustration, a fix you invent yourself, and a reveal of what the field calls what you just built.</p>
+
+      <div class="prereq-box">
+        <strong>Prerequisites:</strong> Basic Python (functions, lists, dicts, loops) and high school maths. No machine learning background required. You will need an API key from <strong>Anthropic</strong> or <strong>OpenAI</strong> — see the provider setup guide in the companion files.
+      </div>
+
+      <div class="home-philosophy">
+        <strong>The rule:</strong> every concept is something you will build before it is named. You will hit a wall, feel the frustration of a broken approach, and then invent the fix yourself. Only after you have invented it will you learn what the field calls it. Hints and solutions are hidden by default — try before you peek.
+      </div>
+
+      <div class="home-grid">
+        <div class="module-card" onclick="showPage('ex-1-1')">
+          <div class="module-card-num">Module 1</div>
+          <div class="module-card-title">The Knowledge Gap</div>
+          <div class="module-card-q">What does an LLM know — and what happens when it doesn't?</div>
+          <div class="module-card-exercises">
+            <span class="ex-pill">1.1 ★☆☆☆☆</span>
+            <span class="ex-pill">1.2 ★★☆☆☆</span>
+          </div>
+        </div>
+        <div class="module-card" onclick="showPage('ex-2-1')">
+          <div class="module-card-num">Module 2</div>
+          <div class="module-card-title">The Search Problem</div>
+          <div class="module-card-q">How do you find a document that means the same thing, even with different words?</div>
+          <div class="module-card-exercises">
+            <span class="ex-pill">2.1 ★★☆☆☆</span>
+            <span class="ex-pill">2.2 ★★★☆☆</span>
+          </div>
+        </div>
+        <div class="module-card" onclick="showPage('ex-3-1')">
+          <div class="module-card-num">Module 3</div>
+          <div class="module-card-title">Inventing RAG</div>
+          <div class="module-card-q">How do you combine retrieval with generation to get grounded answers?</div>
+          <div class="module-card-exercises">
+            <span class="ex-pill">3.1 ★★★☆☆</span>
+            <span class="ex-pill">3.2 ★★★★☆</span>
+          </div>
+        </div>
+        <div class="module-card" onclick="showPage('ex-4-1')">
+          <div class="module-card-num">Module 4</div>
+          <div class="module-card-title">The Single-Step Limit</div>
+          <div class="module-card-q">What happens when answering a question requires doing something?</div>
+          <div class="module-card-exercises">
+            <span class="ex-pill">4.1 ★★☆☆☆</span>
+            <span class="ex-pill">4.2 ★★★☆☆</span>
+          </div>
+        </div>
+        <div class="module-card" onclick="showPage('ex-5-1')" style="grid-column: span 2;">
+          <div class="module-card-num">Module 5</div>
+          <div class="module-card-title">Inventing Agents</div>
+          <div class="module-card-q">How do you give a model the ability to act repeatedly until a task is complete?</div>
+          <div class="module-card-exercises">
+            <span class="ex-pill">5.1 ★★★★☆</span>
+            <span class="ex-pill">5.2 ★★★★☆</span>
+            <span class="ex-pill">5.3 ★★★★★</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="start-btn-wrap">
+        <button class="btn primary" onclick="showPage('ex-1-1')" style="padding: 10px 28px; font-size: 14px;">Start with Exercise 1.1 →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── EXERCISE 1.1 ─── -->
+  <div class="page" id="page-ex-1-1">
+    <div class="exercise-wrap">
+      <div class="ex-eyebrow">Module 1 · Exercise 1.1</div>
+      <h2 class="ex-title">The Amnesiac Oracle</h2>
+      <div class="ex-meta">
+        <div class="ex-difficulty"><span class="stars">★☆☆☆☆</span> Beginner</div>
+        <div class="ex-concept-tag">Hallucination detection</div>
+      </div>
+
+      <div class="section">
+        <div class="section-label">Observe</div>
+        <p>Install the Anthropic SDK and run this code. Both answers should come back instantly and correctly.</p>
+        <div class="code-wrap">
+          <div class="code-header"><span class="code-lang">python</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+          <pre><code class="language-python">import anthropic
+
+client = anthropic.Anthropic()  # reads ANTHROPIC_API_KEY from env
+
+def ask(question):
+    response = client.messages.create(
+        model="claude-haiku-4-5-20251001",
+        max_tokens=256,
+        messages=[{"role": "user", "content": question}]
+    )
+    return response.content[0].text
+
+print(ask("What is the capital of France?"))
+print(ask("Who wrote Hamlet?"))</code></pre>
+        </div>
+        <div class="callout info"><strong>Using OpenAI instead?</strong> See <code>provider_setup.md</code> for the exact code swap. The <code>llm_call()</code> wrapper makes all exercises provider-agnostic.</div>
+      </div>
+
+      <div class="section">
+        <div class="section-label">The Problem</div>
+        <p>Now ask it something the model cannot possibly know.</p>
+        <div class="code-wrap">
+          <div class="code-header"><span class="code-lang">python</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+          <pre><code class="language-python"># This is a made-up internal document. The model has never seen it.
+print(ask("According to Acme Corp's Q3 2024 internal memo, what is the new expense policy for travel?"))</code></pre>
+        </div>
+        <p>Run it. Read the answer carefully. The model answered <strong>confidently</strong>. Is that answer trustworthy? How would you know?</p>
+      </div>
+
+      <div class="section">
+        <div class="section-label">Your Task</div>
+        <p>Write a new version of <code>ask()</code> called <code>honest_ask()</code>. Before calling the API, check whether the question contains <code>"internal memo"</code> or <code>"Q3 2024"</code>. If it does, return a plain string — no API call. Otherwise, call the API normally.</p>
+        <div class="code-wrap">
+          <div class="code-header"><span class="code-lang">python</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+          <pre><code class="language-python">def honest_ask(question):
+    # your code here
+    pass
+
+print(honest_ask("What is the capital of France?"))
+print(honest_ask("According to the Q3 2024 memo, what is the travel policy?"))</code></pre>
+        </div>
+        <p>Then, in one sentence, describe <em>why</em> this keyword check will fail for most real questions.</p>
+      </div>
+
+      <div class="collapsible hint-panel" id="hint-1-1">
+        <button class="collapsible-trigger" onclick="toggleCollapsible('hint-1-1')">
+          <span class="collapsible-icon">▶</span>
+          <span class="collapsible-label-tag">Hint</span>
+          <span>Stuck? Open for a nudge — not the answer.</span>
+        </button>
+        <div class="collapsible-body">
+          <p>Use Python's <code>in</code> operator to check if a substring exists in a string: <code>"Q3 2024" in question</code> returns <code>True</code> or <code>False</code>. You can combine two checks with <code>or</code>.</p>
+          <p>For the reflection question: think about what happens if someone asks about "our travel reimbursement rules last quarter" — no keywords match, even though the intent is the same.</p>
+        </div>
+      </div>
+
+      <div class="collapsible solution-panel" id="sol-1-1">
+        <button class="collapsible-trigger" onclick="toggleCollapsible('sol-1-1')">
+          <span class="collapsible-icon">▶</span>
+          <span class="collapsible-label-tag">Solution</span>
+          <span>Try it yourself first. Open only when ready to check.</span>
+        </button>
+        <div class="collapsible-body">
+          <div class="code-wrap">
+            <div class="code-header"><span class="code-lang">python</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+            <pre><code class="language-python">def honest_ask(question):
+    if "internal memo" in question.lower() or "q3 2024" in question.lower():
+        return "I don't have access to that document."
+    return ask(question)</code></pre>
+          </div>
+          <p>The keyword check fails because it only catches the exact phrases you anticipated. A question like "What changed in the travel rules last summer?" means the same thing but uses no matching words.</p>
+        </div>
+      </div>
+
+      <div class="invented-box">
+        <div class="invented-label">What you invented</div>
+        The intuition behind <strong>Retrieval-Augmented Generation</strong> — the idea that knowledge should come from <em>outside</em> the model, not from inside it. A language model's knowledge is frozen at training time; it cannot know what is in your private database or what happened yesterday. The real fix is giving the model the document at the moment it is asked.
+      </div>
+
+      <div class="ex-footer">
+        <label class="done-checkbox">
+          <input type="checkbox" onchange="markDone('1-1', this.checked)"> Mark as complete
+        </label>
+        <button class="btn primary" onclick="showPage('ex-1-2')">Next: Exercise 1.2 →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── EXERCISE 1.2 ─── -->
+  <div class="page" id="page-ex-1-2">
+    <div class="exercise-wrap">
+      <div class="ex-eyebrow">Module 1 · Exercise 1.2</div>
+      <h2 class="ex-title">Stuffing the Prompt</h2>
+      <div class="ex-meta">
+        <div class="ex-difficulty"><span class="stars">★★☆☆☆</span> Easy</div>
+        <div class="ex-concept-tag">Retrieval as preprocessing</div>
+      </div>
+
+      <div class="section">
+        <div class="section-label">Setup</div>
+        <p>Import the Acme Corp policy documents from the companion dataset file. <code>DOCUMENTS</code> is a list of six policy documents. <code>DOC_A/B/C</code> are travel, remote work, and onboarding — enough for this exercise.</p>
+        <div class="code-wrap">
+          <div class="code-header"><span class="code-lang">python</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+          <pre><code class="language-python">from acme_datasets import DOCUMENTS, DOC_A, DOC_B, DOC_C</code></pre>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-label">Observe</div>
+        <p>Put all three documents directly into the prompt. It works — the model answers correctly from the documents.</p>
+        <div class="code-wrap">
+          <div class="code-header"><span class="code-lang">python</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+          <pre><code class="language-python">def ask_with_docs(question, docs):
+    combined = "\n\n---\n\n".join(docs)
+    prompt = f"""You are a helpful assistant. Use only the documents below to answer.
+If the answer is not in the documents, say "I don't know."
+
+DOCUMENTS:
+{combined}
+
+QUESTION: {question}
+"""
+    response = client.messages.create(
+        model="claude-haiku-4-5-20251001",
+        max_tokens=256,
+        messages=[{"role": "user", "content": prompt}]
+    )
+    return response.content[0].text
+
+all_docs = [DOC_A, DOC_B, DOC_C]
+print(ask_with_docs("What is the hotel allowance?", all_docs))
+print(ask_with_docs("How many days can I work remotely?", all_docs))</code></pre>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-label">The Problem</div>
+        <p>Now imagine you have 10,000 documents instead of 3. Run this calculation to see why that breaks.</p>
+        <div class="code-wrap">
+          <div class="code-header"><span class="code-lang">python</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+          <pre><code class="language-python">words_per_doc = 500
+num_docs = 10_000
+total_words = words_per_doc * num_docs
+approx_tokens = total_words / 0.75  # rough conversion
+
+print(f"Total tokens needed: {approx_tokens:,.0f}")
+print(f"That is roughly {approx_tokens / 200_000:.1f}x a 200k context window")</code></pre>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-label">Your Task</div>
+        <p>You cannot stuff all 10,000 documents into the prompt. Write <code>find_relevant_docs(question, docs)</code> using keyword matching to pick only the most relevant one:</p>
+        <ol>
+          <li>Split the question into individual words (lowercase).</li>
+          <li>For each document, count how many of those words appear in the document text.</li>
+          <li>Return only the single document with the highest count.</li>
+        </ol>
+        <div class="code-wrap">
+          <div class="code-header"><span class="code-lang">python</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+          <pre><code class="language-python">def find_relevant_docs(question, docs):
+    # your code here
+    pass
+
+question = "What is the hotel allowance for travel?"
+best_doc = find_relevant_docs(question, all_docs)
+print(ask_with_docs(question, [best_doc]))</code></pre>
+        </div>
+        <p>Test it with at least two different questions. Then try: <code>"What is the per-night accommodation limit?"</code> — does it still pick the travel document? Think about why it might fail.</p>
+      </div>
+
+      <div class="collapsible hint-panel" id="hint-1-2">
+        <button class="collapsible-trigger" onclick="toggleCollapsible('hint-1-2')">
+          <span class="collapsible-icon">▶</span>
+          <span class="collapsible-label-tag">Hint</span>
+          <span>Stuck? Open for a nudge.</span>
+        </button>
+        <div class="collapsible-body">
+          <p>Use Python's set intersection: <code>set(a) & set(b)</code> gives you the words that appear in both. <code>len(...)</code> gives you the count. Loop over all docs, track the best score and the doc that produced it.</p>
+        </div>
+      </div>
+
+      <div class="collapsible solution-panel" id="sol-1-2">
+        <button class="collapsible-trigger" onclick="toggleCollapsible('sol-1-2')">
+          <span class="collapsible-icon">▶</span>
+          <span class="collapsible-label-tag">Solution</span>
+          <span>Try it yourself first.</span>
+        </button>
+        <div class="collapsible-body">
+          <div class="code-wrap">
+            <div class="code-header"><span class="code-lang">python</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+            <pre><code class="language-python">def find_relevant_docs(question, docs):
+    query_words = set(question.lower().split())
+    best_score = -1
+    best_doc = docs[0]
+    for doc in docs:
+        doc_words = set(doc.lower().split())
+        score = len(query_words & doc_words)
+        if score > best_score:
+            best_score = score
+            best_doc = doc
+    return best_doc</code></pre>
+          </div>
+          <p>The "accommodation limit" question fails because the word "hotel" isn't in the query, so the overlap with DOC_A is lower than you might expect. If a document used "lodging" instead of "accommodation", it would miss entirely — keyword matching is brittle to synonyms.</p>
+        </div>
+      </div>
+
+      <div class="invented-box">
+        <div class="invented-label">What you invented</div>
+        <strong>Retrieval as a preprocessing step</strong> — selecting relevant context before prompting, rather than sending everything. This is the skeleton of RAG. The next module fixes the keyword-matching weakness using vector embeddings.
+      </div>
+
+      <div class="ex-footer">
+        <label class="done-checkbox">
+          <input type="checkbox" onchange="markDone('1-2', this.checked)"> Mark as complete
+        </label>
+        <button class="btn primary" onclick="showPage('ex-2-1')">Next: Exercise 2.1 →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── EXERCISE 2.1 ─── -->
+  <div class="page" id="page-ex-2-1">
+    <div class="exercise-wrap">
+      <div class="ex-eyebrow">Module 2 · Exercise 2.1</div>
+      <h2 class="ex-title">When Words Lie</h2>
+      <div class="ex-meta">
+        <div class="ex-difficulty"><span class="stars">★★☆☆☆</span> Easy</div>
+        <div class="ex-concept-tag">Semantic similarity · Embeddings</div>
+      </div>
+
+      <div class="section">
+        <div class="section-label">Observe</div>
+        <p>Build a tiny search engine using keyword matching and watch it fail on synonyms.</p>
+        <div class="code-wrap">
+          <div class="code-header"><span class="code-lang">python</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+          <pre><code class="language-python">from acme_datasets import MINI_CORPUS
+mini_corpus = MINI_CORPUS  # 8 sentences — includes 3 synonymous hotel-rate sentences
+
+def keyword_search(query, corpus):
+    query_words = set(query.lower().split())
+    scores = []
+    for doc in corpus:
+        doc_words = set(doc.lower().split())
+        overlap = len(query_words & doc_words)
+        scores.append((overlap, doc))
+    scores.sort(reverse=True)
+    return scores
+
+results = keyword_search("what is the hotel allowance", mini_corpus)
+for score, doc in results:
+    print(f"Score {score}: {doc[:70]}")</code></pre>
+        </div>
+        <p>The first sentence scores highest (shares "hotel"). The second and third sentences mean <em>exactly the same thing</em> but score zero — they share no words with the query.</p>
+      </div>
+
+      <div class="section">
+        <div class="section-label">Your Task</div>
+        <p>You will measure meaning using numbers. Install <code>sentence-transformers</code>, then study what it produces:</p>
+        <div class="code-wrap">
+          <div class="code-header"><span class="code-lang">bash</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+          <pre><code class="language-bash">pip install sentence-transformers</code></pre>
+        </div>
+        <div class="code-wrap">
+          <div class="code-header"><span class="code-lang">python</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+          <pre><code class="language-python">from sentence_transformers import SentenceTransformer
+
+model = SentenceTransformer("all-MiniLM-L6-v2")  # ~80MB download on first run
+
+sentences = [
+    "The hotel rate is capped at $250 per night.",
+    "Accommodation costs must not exceed two hundred and fifty dollars.",
+    "Python is a programming language.",
+]
+
+embeddings = model.encode(sentences)
+print(f"Each sentence becomes a vector of {embeddings.shape[1]} numbers.")
+print(f"First 5 numbers for sentence 1: {embeddings[0][:5].round(3)}")
+print(f"First 5 numbers for sentence 2: {embeddings[1][:5].round(3)}")</code></pre>
+        </div>
+        <p>Now implement <strong>dot-product similarity</strong>. Given two vectors <code>a</code> and <code>b</code>, their dot product is the sum of <code>a[i] * b[i]</code> for all <code>i</code>.</p>
+        <div class="code-wrap">
+          <div class="code-header"><span class="code-lang">python</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+          <pre><code class="language-python">def dot_product(vec_a, vec_b):
+    # implement without numpy — use a loop
+    # hint: zip(vec_a, vec_b) gives you pairs
+    pass
+
+a, b, c = embeddings[0], embeddings[1], embeddings[2]
+print(f"Similarity (sentence 1 vs 2): {dot_product(a, b):.3f}")  # should be high
+print(f"Similarity (sentence 1 vs 3): {dot_product(a, c):.3f}")  # should be low</code></pre>
+        </div>
+        <p>Finally, build <code>semantic_search</code> and verify that "accommodation" and "lodging" sentences now rank above the Python sentence:</p>
+        <div class="code-wrap">
+          <div class="code-header"><span class="code-lang">python</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+          <pre><code class="language-python">def semantic_search(query, corpus):
+    query_vec = model.encode([query])[0]
+    corpus_vecs = model.encode(corpus)
+    scores = [(dot_product(query_vec, doc_vec), corpus[i])
+              for i, doc_vec in enumerate(corpus_vecs)]
+    scores.sort(reverse=True)
+    return scores
+
+results = semantic_search("what is the hotel allowance", mini_corpus)
+for score, doc in results:
+    print(f"Score {score:.3f}: {doc[:70]}")</code></pre>
+        </div>
+      </div>
+
+      <div class="collapsible hint-panel" id="hint-2-1">
+        <button class="collapsible-trigger" onclick="toggleCollapsible('hint-2-1')">
+          <span class="collapsible-icon">▶</span>
+          <span class="collapsible-label-tag">Hint</span>
+          <span>Stuck on the dot product?</span>
+        </button>
+        <div class="collapsible-body">
+          <p><code>zip(vec_a, vec_b)</code> gives you pairs like <code>(a0, b0), (a1, b1), ...</code>. Multiply each pair and accumulate the total. Start with <code>total = 0</code>, loop with <code>for x, y in zip(vec_a, vec_b)</code>, add <code>x * y</code> each iteration, return <code>total</code>.</p>
+        </div>
+      </div>
+
+      <div class="collapsible solution-panel" id="sol-2-1">
+        <button class="collapsible-trigger" onclick="toggleCollapsible('sol-2-1')">
+          <span class="collapsible-icon">▶</span>
+          <span class="collapsible-label-tag">Solution</span>
+          <span>Try it yourself first.</span>
+        </button>
+        <div class="collapsible-body">
+          <div class="code-wrap">
+            <div class="code-header"><span class="code-lang">python</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+            <pre><code class="language-python">def dot_product(vec_a, vec_b):
+    return sum(x * y for x, y in zip(vec_a, vec_b))</code></pre>
+          </div>
+          <p>The dot product between two normalized embedding vectors is equivalent to cosine similarity. Vectors representing semantically similar text will point in similar directions in the 384-dimensional space, producing a high dot product.</p>
+        </div>
+      </div>
+
+      <div class="invented-box">
+        <div class="invented-label">What you invented</div>
+        <strong>Semantic search using vector embeddings</strong> — the retrieval backbone of every production RAG system. Instead of matching words, you match meaning. The dot product is a measure of how similar two pieces of text are in meaning-space.
+      </div>
+
+      <div class="ex-footer">
+        <label class="done-checkbox">
+          <input type="checkbox" onchange="markDone('2-1', this.checked)"> Mark as complete
+        </label>
+        <button class="btn primary" onclick="showPage('ex-2-2')">Next: Exercise 2.2 →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── EXERCISE 2.2 ─── -->
+  <div class="page" id="page-ex-2-2">
+    <div class="exercise-wrap">
+      <div class="ex-eyebrow">Module 2 · Exercise 2.2</div>
+      <h2 class="ex-title">Building a Document Index</h2>
+      <div class="ex-meta">
+        <div class="ex-difficulty"><span class="stars">★★★☆☆</span> Intermediate</div>
+        <div class="ex-concept-tag">Vector index</div>
+      </div>
+
+      <div class="section">
+        <div class="section-label">The Goal</div>
+        <p>In production, you embed documents <em>once</em> when they are added and store those embeddings. At query time, you only embed the question — not all documents again. This is what makes semantic search fast.</p>
+      </div>
+
+      <div class="section">
+        <div class="section-label">Your Task</div>
+        <p>Load the 22-document structured dataset and build a simple in-memory vector store.</p>
+        <div class="code-wrap">
+          <div class="code-header"><span class="code-lang">python</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+          <pre><code class="language-python">from sentence_transformers import SentenceTransformer
+from acme_datasets import STRUCTURED_DOCUMENTS as documents
+# 22 policy passages across travel, remote work, IT security, performance, parental leave
+
+model = SentenceTransformer("all-MiniLM-L6-v2")
+print(f"Loaded {len(documents)} documents")</code></pre>
+        </div>
+        <p><strong>Step 1</strong> — Write <code>index_documents(docs)</code> that returns a list of <code>(document, embedding)</code> pairs.</p>
+        <div class="code-wrap">
+          <div class="code-header"><span class="code-lang">python</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+          <pre><code class="language-python">def index_documents(docs):
+    # your code here
+    # hint: model.encode([d["text"] for d in docs]) gives all embeddings at once
+    pass
+
+index = index_documents(documents)
+print(f"Indexed {len(index)} documents, each with {len(index[0][1])} dimensions.")</code></pre>
+        </div>
+        <p><strong>Step 2</strong> — Write <code>retrieve(query, index, top_k)</code> that returns the top-k most relevant docs.</p>
+        <div class="code-wrap">
+          <div class="code-header"><span class="code-lang">python</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+          <pre><code class="language-python">def retrieve(query, index, top_k=2):
+    # 1. embed the query
+    # 2. compute dot product with every indexed embedding
+    # 3. sort and return top_k (document, score) pairs
+    pass
+
+results = retrieve("How much can I spend on food while travelling?", index, top_k=2)
+for doc, score in results:
+    print(f"[{score:.3f}] ({doc['source']}) {doc['text']}")</code></pre>
+        </div>
+        <p><strong>Step 3 (reflect)</strong> — If you had 1 million documents, computing a dot product with each one per query would be slow. In one or two sentences, what might you do to speed this up?</p>
+      </div>
+
+      <div class="collapsible hint-panel" id="hint-2-2">
+        <button class="collapsible-trigger" onclick="toggleCollapsible('hint-2-2')">
+          <span class="collapsible-icon">▶</span>
+          <span class="collapsible-label-tag">Hint</span>
+          <span>Stuck on index_documents or retrieve?</span>
+        </button>
+        <div class="collapsible-body">
+          <p>For <code>index_documents</code>: encode all texts in one batch call, then <code>zip</code> the docs list with the resulting embeddings array.</p>
+          <p>For <code>retrieve</code>: embed the query string, then loop over the index computing <code>dot_product(query_vec, doc_vec)</code> for each, collect <code>(score, doc)</code> pairs, sort descending, return the first <code>top_k</code>.</p>
+          <p>For the speed reflection: instead of scanning every vector, you could group similar vectors into clusters and only search the relevant cluster — this is the core idea behind approximate nearest-neighbor search (HNSW, FAISS).</p>
+        </div>
+      </div>
+
+      <div class="collapsible solution-panel" id="sol-2-2">
+        <button class="collapsible-trigger" onclick="toggleCollapsible('sol-2-2')">
+          <span class="collapsible-icon">▶</span>
+          <span class="collapsible-label-tag">Solution</span>
+          <span>Try it yourself first.</span>
+        </button>
+        <div class="collapsible-body">
+          <div class="code-wrap">
+            <div class="code-header"><span class="code-lang">python</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+            <pre><code class="language-python">def index_documents(docs):
+    texts = [d["text"] for d in docs]
+    embeddings = model.encode(texts)
+    return list(zip(docs, embeddings))
+
+def dot_product(a, b):
+    return sum(x * y for x, y in zip(a, b))
+
+def retrieve(query, index, top_k=2):
+    query_vec = model.encode([query])[0]
+    scored = [(dot_product(query_vec, emb), doc)
+              for doc, emb in index]
+    scored.sort(key=lambda x: x[0], reverse=True)
+    return [(doc, score) for score, doc in scored[:top_k]]</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="invented-box">
+        <div class="invented-label">What you invented</div>
+        A <strong>vector index</strong> — the data structure at the heart of systems like Pinecone, Weaviate, and pgvector. Embed once, query many times.
+      </div>
+
+      <div class="ex-footer">
+        <label class="done-checkbox">
+          <input type="checkbox" onchange="markDone('2-2', this.checked)"> Mark as complete
+        </label>
+        <button class="btn primary" onclick="showPage('ex-3-1')">Next: Exercise 3.1 →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── EXERCISE 3.1 ─── -->
+  <div class="page" id="page-ex-3-1">
+    <div class="exercise-wrap">
+      <div class="ex-eyebrow">Module 3 · Exercise 3.1</div>
+      <h2 class="ex-title">The Grounded Answer</h2>
+      <div class="ex-meta">
+        <div class="ex-difficulty"><span class="stars">★★★☆☆</span> Intermediate</div>
+        <div class="ex-concept-tag">Retrieval-Augmented Generation (RAG)</div>
+      </div>
+
+      <div class="section">
+        <div class="section-label">Observe</div>
+        <p>Connect your retrieval system and language model naively — retrieve top-2 docs, inject into prompt, generate.</p>
+        <div class="code-wrap">
+          <div class="code-header"><span class="code-lang">python</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+          <pre><code class="language-python"># Paste your index_documents and retrieve functions from Exercise 2.2 here
+# index = index_documents(documents)
+
+def naive_rag(question):
+    results = retrieve(question, index, top_k=2)
+    context = "\n".join([doc["text"] for doc, score in results])
+    prompt = f"Context:\n{context}\n\nQuestion: {question}\nAnswer:"
+    response = client.messages.create(
+        model="claude-haiku-4-5-20251001",
+        max_tokens=200,
+        messages=[{"role": "user", "content": prompt}]
+    )
+    return response.content[0].text
+
+print(naive_rag("How much can I spend on a hotel?"))</code></pre>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-label">The Problem</div>
+        <p>Ask a question completely outside the documents:</p>
+        <div class="code-wrap">
+          <div class="code-header"><span class="code-lang">python</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+          <pre><code class="language-python">print(naive_rag("What is the boiling point of water?"))</code></pre>
+        </div>
+        <p>Does the model say "I don't know" or does it answer from general knowledge, ignoring the retrieved context?</p>
+      </div>
+
+      <div class="section">
+        <div class="section-label">Your Task</div>
+        <p>Improve <code>naive_rag</code> into <code>grounded_rag</code> with two changes:</p>
+        <ol>
+          <li>Improve the prompt: add a clear instruction to answer only using the context, and to return a specific fallback string if the context doesn't contain the answer.</li>
+          <li>Add a <strong>confidence gate</strong>: after retrieval, check the top similarity score. If it's below <code>0.35</code>, skip the API call entirely and return the fallback string directly.</li>
+        </ol>
+        <div class="code-wrap">
+          <div class="code-header"><span class="code-lang">python</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+          <pre><code class="language-python">def grounded_rag(question, confidence_threshold=0.35):
+    results = retrieve(question, index, top_k=2)
+    top_score = results[0][1]  # similarity score of best match
+
+    # your confidence gate here
+
+    context = "\n".join([doc["text"] for doc, score in results])
+    prompt = # your improved prompt here
+
+    response = client.messages.create(
+        model="claude-haiku-4-5-20251001",
+        max_tokens=200,
+        messages=[{"role": "user", "content": prompt}]
+    )
+    return response.content[0].text
+
+print(grounded_rag("How much can I spend on a hotel?"))
+print(grounded_rag("What is the boiling point of water?"))
+print(grounded_rag("Who invented the telephone?"))</code></pre>
+        </div>
+      </div>
+
+      <div class="collapsible hint-panel" id="hint-3-1">
+        <button class="collapsible-trigger" onclick="toggleCollapsible('hint-3-1')">
+          <span class="collapsible-icon">▶</span>
+          <span class="collapsible-label-tag">Hint</span>
+          <span>Stuck on the confidence gate or prompt?</span>
+        </button>
+        <div class="collapsible-body">
+          <p>The gate is just: <code>if top_score &lt; confidence_threshold: return "I cannot answer..."</code>. Put it before the API call.</p>
+          <p>The prompt should tell the model: "Answer only using the context below. If the context does not contain the answer, respond with exactly: I cannot answer this from the provided documents."</p>
+        </div>
+      </div>
+
+      <div class="collapsible solution-panel" id="sol-3-1">
+        <button class="collapsible-trigger" onclick="toggleCollapsible('sol-3-1')">
+          <span class="collapsible-icon">▶</span>
+          <span class="collapsible-label-tag">Solution</span>
+          <span>Try it yourself first.</span>
+        </button>
+        <div class="collapsible-body">
+          <div class="code-wrap">
+            <div class="code-header"><span class="code-lang">python</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+            <pre><code class="language-python">FALLBACK = "I cannot answer this from the provided documents."
+
+def grounded_rag(question, confidence_threshold=0.35):
+    results = retrieve(question, index, top_k=2)
+    top_score = results[0][1]
+
+    if top_score < confidence_threshold:
+        return FALLBACK
+
+    context = "\n".join([doc["text"] for doc, score in results])
+    prompt = f"""Answer only using the context below.
+If the context does not contain the answer, respond with exactly:
+{FALLBACK}
+
+CONTEXT:
+{context}
+
+QUESTION: {question}
+ANSWER:"""
+
+    response = client.messages.create(
+        model="claude-haiku-4-5-20251001",
+        max_tokens=200,
+        messages=[{"role": "user", "content": prompt}]
+    )
+    return response.content[0].text</code></pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="invented-box">
+        <div class="invented-label">What you invented</div>
+        <strong>Retrieval-Augmented Generation (RAG)</strong> — the dominant architecture for grounding LLMs in private or recent knowledge. The confidence gate is a simple but important production pattern: it prevents hallucination when retrieval fails.
+      </div>
+
+      <div class="ex-footer">
+        <label class="done-checkbox">
+          <input type="checkbox" onchange="markDone('3-1', this.checked)"> Mark as complete
+        </label>
+        <button class="btn primary" onclick="showPage('ex-3-2')">Next: Exercise 3.2 →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── EXERCISE 3.2 ─── -->
+  <div class="page" id="page-ex-3-2">
+    <div class="exercise-wrap">
+      <div class="ex-eyebrow">Module 3 · Exercise 3.2</div>
+      <h2 class="ex-title">Chunking and the Goldilocks Problem</h2>
+      <div class="ex-meta">
+        <div class="ex-difficulty"><span class="stars">★★★★☆</span> Hard</div>
+        <div class="ex-concept-tag">Chunking with overlap</div>
+      </div>
+
+      <div class="section">
+        <div class="section-label">The Problem</div>
+        <p>If you embed an entire 10-page PDF as one vector, you lose precision — the embedding averages over too many topics. But if you split every sentence, each chunk loses context. There is a Goldilocks size.</p>
+        <p>Load the long travel policy document and run the chunking function below.</p>
+        <div class="code-wrap">
+          <div class="code-header"><span class="code-lang">python</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+          <pre><code class="language-python">from acme_datasets import LONG_TRAVEL_POLICY
+
+def chunk_document(text, chunk_size=100, overlap=20):
+    """
+    Split text into chunks of ~chunk_size words,
+    with overlap words repeated at the start of each new chunk.
+    """
+    words = text.split()
+    chunks = []
+    start = 0
+    while start < len(words):
+        end = start + chunk_size
+        chunk = " ".join(words[start:end])
+        chunks.append(chunk)
+        start += chunk_size - overlap
+    return chunks
+
+chunks = chunk_document(LONG_TRAVEL_POLICY, chunk_size=60, overlap=15)
+print(f"Created {len(chunks)} chunks")
+for i, chunk in enumerate(chunks):
+    print(f"\n--- Chunk {i+1} ---\n{chunk[:120]}...")</code></pre>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-label">Your Task</div>
+        <p>Index the chunks and test retrieval quality:</p>
+        <div class="code-wrap">
+          <div class="code-header"><span class="code-lang">python</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+          <pre><code class="language-python">chunked_docs = [{"id": i, "text": chunk, "source": "travel_policy_full.txt"}
+                for i, chunk in enumerate(chunks)]
+chunk_index = index_documents(chunked_docs)
+
+questions = [
+    "Can I fly business class?",
+    "Can I use Airbnb?",
+    "How much per kilometre for my own car?",
+    "Is alcohol reimbursable?",
+]
+for q in questions:
+    results = retrieve(q, chunk_index, top_k=1)
+    doc, score = results[0]
+    print(f"\nQ: {q}")
+    print(f"Score {score:.3f}: {doc['text'][:100]}...")</code></pre>
+        </div>
+        <p><strong>Experiment:</strong> Change <code>chunk_size</code> to 20 (very small) and then to 200 (very large). How does retrieval quality change? Write your observations as a comment in the code.</p>
+      </div>
+
+      <div class="collapsible hint-panel" id="hint-3-2">
+        <button class="collapsible-trigger" onclick="toggleCollapsible('hint-3-2')">
+          <span class="collapsible-icon">▶</span>
+          <span class="collapsible-label-tag">Hint — what to expect</span>
+          <span>What should you observe when changing chunk size?</span>
+        </button>
+        <div class="collapsible-body">
+          <p><strong>Very small chunks (20 words):</strong> High precision on simple factual lookups, but short chunks lose surrounding context. A chunk might have "is $250" with no mention of what the $250 applies to.</p>
+          <p><strong>Very large chunks (200 words):</strong> Chunks cover multiple topics. The embedding averages over all of them, so a query about "alcohol" might retrieve a chunk that mentions alcohol in one sentence but is mostly about flights.</p>
+          <p>The overlap is important: without it, a relevant sentence that sits exactly at a chunk boundary gets split, and neither chunk captures it fully.</p>
+        </div>
+      </div>
+
+      <div class="invented-box">
+        <div class="invented-label">What you invented</div>
+        <strong>Document chunking with overlap</strong> — a standard preprocessing step in all production RAG systems. The overlap prevents relevant sentences from being split across chunk boundaries and losing context.
+      </div>
+
+      <div class="ex-footer">
+        <label class="done-checkbox">
+          <input type="checkbox" onchange="markDone('3-2', this.checked)"> Mark as complete
+        </label>
+        <button class="btn primary" onclick="showPage('ex-4-1')">Next: Exercise 4.1 →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── EXERCISE 4.1 ─── -->
+  <div class="page" id="page-ex-4-1">
+    <div class="exercise-wrap">
+      <div class="ex-eyebrow">Module 4 · Exercise 4.1</div>
+      <h2 class="ex-title">The Model That Cannot Act</h2>
+      <div class="ex-meta">
+        <div class="ex-difficulty"><span class="stars">★★☆☆☆</span> Easy</div>
+        <div class="ex-concept-tag">Tool use · Function calling</div>
+      </div>
+
+      <div class="section">
+        <div class="section-label">Observe</div>
+        <p>Ask the model things that require real-time actions and watch it struggle.</p>
+        <div class="code-wrap">
+          <div class="code-header"><span class="code-lang">python</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+          <pre><code class="language-python">import datetime
+
+print(ask("What time is it right now?"))
+print(ask("What is 10% of 847.33?"))
+print(ask(f"Today is {datetime.date.today()}. How many days until Christmas?"))</code></pre>
+        </div>
+        <p>The model is stateless and sandboxed. It cannot call a clock, run a calculator, search the web, or write a file. It can only process text and return text.</p>
+      </div>
+
+      <div class="section">
+        <div class="section-label">Your Task</div>
+        <p>Build a toolkit of Python functions — things the model cannot do but you can.</p>
+        <div class="code-wrap">
+          <div class="code-header"><span class="code-lang">python</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+          <pre><code class="language-python">import datetime
+
+def get_current_date():
+    return str(datetime.date.today())
+
+def calculate(expression):
+    allowed = set("0123456789+-*/()., ")
+    if not all(c in allowed for c in expression):
+        return "Error: invalid expression"
+    try:
+        return str(round(eval(expression), 4))
+    except Exception as e:
+        return f"Error: {e}"
+
+def days_until(target_date_str):
+    today = datetime.date.today()
+    target = datetime.date.fromisoformat(target_date_str)
+    return str((target - today).days)
+
+print(get_current_date())
+print(calculate("847.33 * 0.1"))
+print(days_until("2025-12-25"))</code></pre>
+        </div>
+        <p>Now invent a protocol so the model can <em>request</em> a tool call using plain text. Write a prompt that instructs the model to respond in this format when it needs a tool:</p>
+        <div class="code-wrap">
+          <div class="code-header"><span class="code-lang">python</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+          <pre><code class="language-python">TOOL_PROMPT = """You are a helpful assistant. You have access to these tools:
+
+- get_current_date(): returns today's date
+- calculate(expression): evaluates a math expression, e.g. calculate(2 + 2)
+- days_until(YYYY-MM-DD): returns number of days from today until that date
+
+When you need a tool, respond ONLY with:
+TOOL: tool_name
+INPUT: the input
+
+When you have a final answer, respond ONLY with:
+ANSWER: your answer
+
+Do not include any other text.
+"""
+
+def ask_with_tools(question):
+    response = client.messages.create(
+        model="claude-haiku-4-5-20251001",
+        max_tokens=100,
+        messages=[{"role": "user", "content": TOOL_PROMPT + "\n\nQuestion: " + question}]
+    )
+    return response.content[0].text
+
+print(ask_with_tools("What is today's date?"))
+print(ask_with_tools("Calculate 18% of 350."))</code></pre>
+        </div>
+        <p>Does the model output <code>TOOL:</code> and <code>INPUT:</code> correctly? What happens if you ask something that requires two tool calls?</p>
+      </div>
+
+      <div class="collapsible hint-panel" id="hint-4-1">
+        <button class="collapsible-trigger" onclick="toggleCollapsible('hint-4-1')">
+          <span class="collapsible-icon">▶</span>
+          <span class="collapsible-label-tag">Hint</span>
+          <span>What if the model doesn't follow the format?</span>
+        </button>
+        <div class="collapsible-body">
+          <p>If the model produces freeform text, make the format constraint more explicit: add "You must always respond in exactly one of these two formats. Never add explanations." Strong format instructions help smaller models like Haiku stay on-protocol.</p>
+        </div>
+      </div>
+
+      <div class="invented-box">
+        <div class="invented-label">What you invented</div>
+        <strong>Tool use / function calling</strong> — the mechanism that allows language models to request external actions. The model is a reasoning engine, not an execution engine. You are the executor; the model just tells you what to run.
+      </div>
+
+      <div class="ex-footer">
+        <label class="done-checkbox">
+          <input type="checkbox" onchange="markDone('4-1', this.checked)"> Mark as complete
+        </label>
+        <button class="btn primary" onclick="showPage('ex-4-2')">Next: Exercise 4.2 →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── EXERCISE 4.2 ─── -->
+  <div class="page" id="page-ex-4-2">
+    <div class="exercise-wrap">
+      <div class="ex-eyebrow">Module 4 · Exercise 4.2</div>
+      <h2 class="ex-title">Parsing and Executing Tool Calls</h2>
+      <div class="ex-meta">
+        <div class="ex-difficulty"><span class="stars">★★★☆☆</span> Intermediate</div>
+        <div class="ex-concept-tag">Tool dispatcher</div>
+      </div>
+
+      <div class="section">
+        <div class="section-label">Your Task</div>
+        <p>Complete the loop: parse the model's text output, run the right tool, and feed the result back.</p>
+        <div class="code-wrap">
+          <div class="code-header"><span class="code-lang">python</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+          <pre><code class="language-python">def parse_response(text):
+    """
+    Returns:
+      ("tool", tool_name, tool_input)  — model wants a tool
+      ("answer", final_answer)         — model has an answer
+      ("unknown", raw_text)            — parse failed
+    """
+    text = text.strip()
+    lines = text.split("\n")
+    if lines[0].startswith("TOOL:"):
+        tool_name = lines[0].replace("TOOL:", "").strip()
+        tool_input = lines[1].replace("INPUT:", "").strip() if len(lines) > 1 else ""
+        return ("tool", tool_name, tool_input)
+    elif lines[0].startswith("ANSWER:"):
+        return ("answer", lines[0].replace("ANSWER:", "").strip())
+    else:
+        return ("unknown", text)
+
+def run_tool(tool_name, tool_input):
+    if tool_name == "get_current_date":
+        return get_current_date()
+    elif tool_name == "calculate":
+        return calculate(tool_input)
+    elif tool_name.startswith("days_until"):
+        return days_until(tool_input)
+    else:
+        return f"Unknown tool: {tool_name}"</code></pre>
+        </div>
+        <p>Now write <code>one_step_agent(question)</code> that asks the model, parses the response, runs the tool if needed, and returns the result.</p>
+        <div class="code-wrap">
+          <div class="code-header"><span class="code-lang">python</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+          <pre><code class="language-python">def one_step_agent(question):
+    raw = ask_with_tools(question)
+    print(f"Model said: {raw}")
+    result = parse_response(raw)
+
+    if result[0] == "tool":
+        _, tool_name, tool_input = result
+        tool_result = run_tool(tool_name, tool_input)
+        print(f"Tool result: {tool_result}")
+        return f"Tool called. Result: {tool_result}"
+    elif result[0] == "answer":
+        return result[1]
+    else:
+        return f"Could not parse: {result[1]}"
+
+print(one_step_agent("What is today's date?"))
+print(one_step_agent("Calculate 18% of 350."))</code></pre>
+        </div>
+        <p>Now try this question that requires <em>two</em> tool calls — and observe that <code>one_step_agent</code> cannot handle it:</p>
+        <div class="code-wrap">
+          <div class="code-header"><span class="code-lang">python</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+          <pre><code class="language-python">print(one_step_agent("How many days from today until New Year's Day next year?"))</code></pre>
+        </div>
+        <p>What would it take to handle this? (You don't need to implement it yet — just reason about it.)</p>
+      </div>
+
+      <div class="invented-box">
+        <div class="invented-label">What you invented</div>
+        A <strong>tool dispatcher</strong> — the bridge between a model's text output and real-world actions. A single tool call is not enough for complex questions. You need a loop — the model calls a tool, gets a result, decides if it needs another, calls again. That loop is an agent.
+      </div>
+
+      <div class="ex-footer">
+        <label class="done-checkbox">
+          <input type="checkbox" onchange="markDone('4-2', this.checked)"> Mark as complete
+        </label>
+        <button class="btn primary" onclick="showPage('ex-5-1')">Next: Exercise 5.1 →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── EXERCISE 5.1 ─── -->
+  <div class="page" id="page-ex-5-1">
+    <div class="exercise-wrap">
+      <div class="ex-eyebrow">Module 5 · Exercise 5.1</div>
+      <h2 class="ex-title">The Reasoning Loop</h2>
+      <div class="ex-meta">
+        <div class="ex-difficulty"><span class="stars">★★★★☆</span> Hard</div>
+        <div class="ex-concept-tag">Agentic loop · ReAct pattern</div>
+      </div>
+
+      <div class="section">
+        <div class="section-label">The Key Idea</div>
+        <p>An agent is not a single API call. It is a loop where:</p>
+        <ol>
+          <li>The model receives the question and any previous tool results.</li>
+          <li>The model decides: do I have enough information to answer, or do I need a tool?</li>
+          <li>If it needs a tool, run it, add the result to the conversation, go to step 1.</li>
+          <li>If it has an answer, return it and stop.</li>
+        </ol>
+      </div>
+
+      <div class="section">
+        <div class="section-label">Your Task</div>
+        <p>Build a multi-turn agent using a conversation history list.</p>
+        <div class="code-wrap">
+          <div class="code-header"><span class="code-lang">python</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+          <pre><code class="language-python">def run_agent(question, max_steps=5):
+    messages = [
+        {"role": "user", "content": TOOL_PROMPT + "\n\nQuestion: " + question}
+    ]
+
+    for step in range(max_steps):
+        print(f"\n--- Step {step + 1} ---")
+
+        response = client.messages.create(
+            model="claude-haiku-4-5-20251001",
+            max_tokens=150,
+            messages=messages
+        )
+        model_text = response.content[0].text.strip()
+        print(f"Model: {model_text}")
+        messages.append({"role": "assistant", "content": model_text})
+
+        result = parse_response(model_text)
+
+        if result[0] == "answer":
+            print(f"\nFinal answer: {result[1]}")
+            return result[1]
+
+        elif result[0] == "tool":
+            _, tool_name, tool_input = result
+            tool_result = run_tool(tool_name, tool_input)
+            print(f"Tool result: {tool_result}")
+            messages.append({
+                "role": "user",
+                "content": f"Tool result: {tool_result}\n\nContinue. Provide ANSWER if done, or call another tool."
+            })
+        else:
+            print(f"Parse failed: {result[1]}")
+            break
+
+    return "Agent exceeded maximum steps."</code></pre>
+        </div>
+        <p>Test these questions and count how many steps each takes:</p>
+        <div class="code-wrap">
+          <div class="code-header"><span class="code-lang">python</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+          <pre><code class="language-python">run_agent("What is today's date?")                                # 1 step
+run_agent("What is 22% of 4500?")                               # 1 step
+run_agent("How many days until July 4th from today?")           # 2 steps
+run_agent("What is 15% of the number of days until New Year?")  # 3 steps — chain!</code></pre>
+        </div>
+      </div>
+
+      <div class="collapsible hint-panel" id="hint-5-1">
+        <button class="collapsible-trigger" onclick="toggleCollapsible('hint-5-1')">
+          <span class="collapsible-icon">▶</span>
+          <span class="collapsible-label-tag">Hint</span>
+          <span>What if the chain doesn't work?</span>
+        </button>
+        <div class="collapsible-body">
+          <p>The key is that every tool result gets appended to <code>messages</code> as a <code>user</code> role message before the next model call. This way the model sees the full history of what it asked for and what it received. If it's not chaining, check that you're appending both the model's response (<code>assistant</code>) and the tool result (<code>user</code>) each iteration.</p>
+        </div>
+      </div>
+
+      <div class="invented-box">
+        <div class="invented-label">What you invented</div>
+        The <strong>agentic loop</strong> (also called the <strong>ReAct pattern</strong>) — the core architecture of every AI agent, from simple assistants to autonomous research systems. The loop lets the model chain multiple tool calls before arriving at a final answer.
+      </div>
+
+      <div class="ex-footer">
+        <label class="done-checkbox">
+          <input type="checkbox" onchange="markDone('5-1', this.checked)"> Mark as complete
+        </label>
+        <button class="btn primary" onclick="showPage('ex-5-2')">Next: Exercise 5.2 →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── EXERCISE 5.2 ─── -->
+  <div class="page" id="page-ex-5-2">
+    <div class="exercise-wrap">
+      <div class="ex-eyebrow">Module 5 · Exercise 5.2</div>
+      <h2 class="ex-title">Giving the Agent Memory</h2>
+      <div class="ex-meta">
+        <div class="ex-difficulty"><span class="stars">★★★★☆</span> Hard</div>
+        <div class="ex-concept-tag">External agent memory</div>
+      </div>
+
+      <div class="section">
+        <div class="section-label">The Problem</div>
+        <p>Your agent has no memory between separate <code>run_agent</code> calls. Try this:</p>
+        <div class="code-wrap">
+          <div class="code-header"><span class="code-lang">python</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+          <pre><code class="language-python">run_agent("My monthly budget is $3000.")
+run_agent("How much is 40% of my budget?")  # it doesn't know the budget</code></pre>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-label">Your Task</div>
+        <p>Add a simple external memory store with two new tools: <code>remember(key=value)</code> and <code>recall(key)</code>.</p>
+        <div class="code-wrap">
+          <div class="code-header"><span class="code-lang">python</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+          <pre><code class="language-python">memory_store = {}
+
+def remember(key_value):
+    """Input format: "key=value". Example: remember(monthly_budget=3000)"""
+    if "=" not in key_value:
+        return "Error: format must be key=value"
+    key, value = key_value.split("=", 1)
+    memory_store[key.strip()] = value.strip()
+    return f"Remembered: {key.strip()} = {value.strip()}"
+
+def recall(key):
+    key = key.strip()
+    if key in memory_store:
+        return memory_store[key]
+    return f"Nothing stored under '{key}'"</code></pre>
+        </div>
+        <p>Update <code>TOOL_PROMPT</code> to include these two new tools, and update <code>run_tool</code> to dispatch to them. Then test:</p>
+        <div class="code-wrap">
+          <div class="code-header"><span class="code-lang">python</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+          <pre><code class="language-python">TOOL_PROMPT_V2 = """You are a helpful assistant with access to these tools:
+
+- get_current_date(): returns today's date
+- calculate(expression): evaluates a math expression
+- days_until(YYYY-MM-DD): returns days from today to target date
+- remember(key=value): stores information for later, e.g. remember(budget=3000)
+- recall(key): retrieves stored information, e.g. recall(budget)
+
+When you need a tool:
+TOOL: tool_name
+INPUT: the input
+
+When you have a final answer:
+ANSWER: your answer
+"""
+
+memory_store.clear()
+run_agent("Remember that my monthly budget is 3000.", max_steps=3)
+run_agent("How much is 40% of my monthly budget?", max_steps=5)</code></pre>
+        </div>
+        <p>The agent should call <code>recall(monthly_budget)</code>, get <code>3000</code>, then call <code>calculate(3000 * 0.4)</code>.</p>
+      </div>
+
+      <div class="invented-box">
+        <div class="invented-label">What you invented</div>
+        <strong>External agent memory</strong> — the pattern used in LangChain's memory modules, AutoGPT's file-based memory, and enterprise AI assistants. The model itself is stateless; the <em>system</em> around it remembers.
+      </div>
+
+      <div class="ex-footer">
+        <label class="done-checkbox">
+          <input type="checkbox" onchange="markDone('5-2', this.checked)"> Mark as complete
+        </label>
+        <button class="btn primary" onclick="showPage('ex-5-3')">Next: Exercise 5.3 →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── EXERCISE 5.3 ─── -->
+  <div class="page" id="page-ex-5-3">
+    <div class="exercise-wrap">
+      <div class="ex-eyebrow">Module 5 · Exercise 5.3</div>
+      <h2 class="ex-title">RAG Agent: Combining Everything</h2>
+      <div class="ex-meta">
+        <div class="ex-difficulty"><span class="stars">★★★★★</span> Expert</div>
+        <div class="ex-concept-tag">RAG agent · Full pipeline</div>
+      </div>
+
+      <div class="section">
+        <div class="section-label">The Goal</div>
+        <p>Combine everything you have built: the vector index (Module 2), grounded generation (Module 3), and agentic loop (Module 5). The agent can both retrieve from documents and use tools — and decides which it needs at each step.</p>
+      </div>
+
+      <div class="section">
+        <div class="section-label">Your Task</div>
+        <p>Add a <code>search_docs(query)</code> tool that wraps your retrieval system:</p>
+        <div class="code-wrap">
+          <div class="code-header"><span class="code-lang">python</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+          <pre><code class="language-python"># Make sure your index from Exercise 2.2 is still loaded
+# index = index_documents(STRUCTURED_DOCUMENTS)
+
+def search_docs(query):
+    results = retrieve(query, index, top_k=1)
+    if not results:
+        return "No relevant documents found."
+    doc, score = results[0]
+    if score < 0.30:
+        return "No sufficiently relevant documents found."
+    return f"[Source: {doc['source']}] {doc['text']}"</code></pre>
+        </div>
+        <p>Update your tool prompt and dispatcher to include <code>search_docs</code>, then test the full agent:</p>
+        <div class="code-wrap">
+          <div class="code-header"><span class="code-lang">python</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+          <pre><code class="language-python">TOOL_PROMPT_FINAL = """You are a helpful assistant for Acme Corp employees.
+Tools available:
+- search_docs(query): searches the internal policy documents
+- calculate(expression): evaluates a math expression
+- get_current_date(): returns today's date
+- days_until(YYYY-MM-DD): returns days from today to a date
+- remember(key=value): stores a fact for later
+- recall(key): retrieves a stored fact
+
+Use search_docs first when the question is about company policy.
+Chain tools as needed before giving a final answer.
+
+TOOL: tool_name
+INPUT: the input
+
+ANSWER: your answer
+"""
+
+# Retrieval only
+run_agent("What is the hotel allowance per night?", max_steps=3)
+run_agent("Can I expense alcohol at a client dinner?", max_steps=3)
+
+# Retrieval + calculation
+run_agent("I have a 5-day business trip. What is the maximum I can claim for meals?", max_steps=5)
+
+# Retrieval + memory + calculation
+memory_store.clear()
+run_agent("Remember that my trip has 5 nights and 4 full travel days.", max_steps=3)
+run_agent("What is the total maximum I can claim for hotel and meals combined?", max_steps=7)</code></pre>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-label">Evaluate Your Agent</div>
+        <p>The companion dataset includes 15 graded question-answer pairs. Run them and score your agent manually.</p>
+        <div class="code-wrap">
+          <div class="code-header"><span class="code-lang">python</span><button class="code-copy" onclick="copyCode(this)">Copy</button></div>
+          <pre><code class="language-python">from acme_datasets import QA_EVAL_SET
+
+for qa in QA_EVAL_SET:
+    print(f"\nQ ({qa['difficulty']}): {qa['question']}")
+    print(f"Expected: {qa['expected_answer']}")
+    agent_answer = run_agent(qa['question'], max_steps=5)
+    print(f"Agent:    {agent_answer}")</code></pre>
+        </div>
+        <div class="callout success">A score of <strong>10/15 or higher</strong> means your RAG agent is working well. The hard questions (requiring retrieval + calculation) are the real test.</div>
+      </div>
+
+      <div class="collapsible reveal-panel" id="reveal-5-3">
+        <button class="collapsible-trigger" onclick="toggleCollapsible('reveal-5-3')">
+          <span class="collapsible-icon">▶</span>
+          <span class="collapsible-label-tag">Reflect</span>
+          <span>Walk through what the agent did on the last question</span>
+        </button>
+        <div class="collapsible-body">
+          <p>For "What is the total maximum I can claim for hotel and meals combined?" after storing trip info:</p>
+          <ol style="padding-left:18px; margin-top:8px;">
+            <li style="margin-bottom:6px;">Agent calls <code>recall(nights)</code> → gets 5</li>
+            <li style="margin-bottom:6px;">Agent calls <code>recall(travel_days)</code> → gets 4</li>
+            <li style="margin-bottom:6px;">Agent calls <code>search_docs(hotel allowance)</code> → gets $250/night</li>
+            <li style="margin-bottom:6px;">Agent calls <code>search_docs(meal allowance)</code> → gets $60/day</li>
+            <li style="margin-bottom:6px;">Agent calls <code>calculate(5*250 + 4*60)</code> → gets $1490</li>
+            <li>Agent returns ANSWER: $1490</li>
+          </ol>
+          <p style="margin-top:10px;">Five tools, chained autonomously. That is the ReAct pattern in production.</p>
+        </div>
+      </div>
+
+      <div class="invented-box">
+        <div class="invented-label">What you invented</div>
+        A <strong>RAG-powered tool-using agent</strong> — an architecture that appears in production systems like Perplexity, enterprise knowledge assistants, and AI copilots. You built it from scratch, from first principles, without a framework.
+      </div>
+
+      <div class="ex-footer">
+        <label class="done-checkbox">
+          <input type="checkbox" onchange="markDone('5-3', this.checked)"> Mark as complete
+        </label>
+        <button class="btn primary" onclick="showPage('epilogue')">View Epilogue →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── EPILOGUE ─── -->
+  <div class="page" id="page-epilogue">
+    <div class="exercise-wrap">
+      <div class="ex-eyebrow">Epilogue</div>
+      <h2 class="ex-title">What You Invented, and What It Is Called</h2>
+
+      <table class="summary-table">
+        <thead>
+          <tr>
+            <th>Exercise</th>
+            <th>What you built</th>
+            <th>Industry name</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>1.1</td><td>Detected unanswerable questions</td><td><em>Hallucination detection</em></td></tr>
+          <tr><td>1.2</td><td>Selected relevant docs before prompting</td><td><em>Context injection / prompt stuffing</em></td></tr>
+          <tr><td>2.1</td><td>Measured meaning with dot products</td><td><em>Semantic similarity / cosine similarity</em></td></tr>
+          <tr><td>2.2</td><td>Stored embeddings once, queried many times</td><td><em>Vector index</em></td></tr>
+          <tr><td>3.1</td><td>Retrieved then generated, with a fallback</td><td><em>Retrieval-Augmented Generation (RAG)</em></td></tr>
+          <tr><td>3.2</td><td>Split long docs into overlapping windows</td><td><em>Chunking with overlap</em></td></tr>
+          <tr><td>4.1</td><td>Made the model describe actions as text</td><td><em>Tool use / function calling</em></td></tr>
+          <tr><td>4.2</td><td>Parsed model text and ran the right function</td><td><em>Tool dispatcher</em></td></tr>
+          <tr><td>5.1</td><td>Looped model + tools until task complete</td><td><em>Agentic loop / ReAct pattern</em></td></tr>
+          <tr><td>5.2</td><td>Added persistent storage outside the model</td><td><em>External agent memory</em></td></tr>
+          <tr><td>5.3</td><td>Combined retrieval, tools, memory, and loop</td><td><em>RAG agent</em></td></tr>
+        </tbody>
+      </table>
+
+      <div class="section" style="margin-top:40px;">
+        <div class="section-label">Going Further</div>
+        <ul style="padding-left:20px; color:var(--ink-2); line-height:2;">
+          <li><strong style="color:var(--ink)">Proper vector databases.</strong> Replace your in-memory index with ChromaDB or Qdrant — both have free local modes and Python clients.</li>
+          <li><strong style="color:var(--ink)">The ReAct paper.</strong> Read <em>ReAct: Synergizing Reasoning and Acting in Language Models</em> (Yao et al., 2022). It formalises the loop you built in Exercise 5.1.</li>
+          <li><strong style="color:var(--ink)">Native tool use APIs.</strong> Both Anthropic and OpenAI support structured function calling natively — the model returns JSON instead of the text protocol you invented. Rewrite your agent using it.</li>
+          <li><strong style="color:var(--ink)">Evaluation.</strong> Build a larger evaluation set and measure your agent's accuracy systematically — not just 15 hand-graded questions.</li>
+          <li><strong style="color:var(--ink)">Multi-agent systems.</strong> What if one agent specialised in retrieval and another in calculation, and a coordinator agent decided which to call? That is a multi-agent system — the current frontier.</li>
+        </ul>
+      </div>
+
+      <div class="callout success" style="margin-top:32px;">
+        <strong>You built a RAG agent from first principles.</strong> Without a framework, without a tutorial that told you the answer upfront — just a problem, a frustration, and a fix you invented yourself.
+      </div>
+    </div>
+  </div>
+
+</div><!-- /main -->
+
+<script>
+  const EXERCISES = ['1-1','1-2','2-1','2-2','3-1','3-2','4-1','4-2','5-1','5-2','5-3'];
+  const done = {};
+  const BREADCRUMBS = {
+    'home': 'Overview',
+    'ex-1-1': 'Module 1 · 1.1 — The Amnesiac Oracle',
+    'ex-1-2': 'Module 1 · 1.2 — Stuffing the Prompt',
+    'ex-2-1': 'Module 2 · 2.1 — When Words Lie',
+    'ex-2-2': 'Module 2 · 2.2 — Building a Document Index',
+    'ex-3-1': 'Module 3 · 3.1 — The Grounded Answer',
+    'ex-3-2': 'Module 3 · 3.2 — Chunking',
+    'ex-4-1': 'Module 4 · 4.1 — The Model That Cannot Act',
+    'ex-4-2': 'Module 4 · 4.2 — Parsing Tool Calls',
+    'ex-5-1': 'Module 5 · 5.1 — The Reasoning Loop',
+    'ex-5-2': 'Module 5 · 5.2 — Giving the Agent Memory',
+    'ex-5-3': 'Module 5 · 5.3 — RAG Agent',
+    'epilogue': 'Epilogue',
+  };
+
+  let currentPage = 'home';
+
+  function showPage(id) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    const page = document.getElementById('page-' + id);
+    if (page) page.classList.add('active');
+    currentPage = id;
+    document.getElementById('breadcrumb').innerHTML = '<span>' + (BREADCRUMBS[id] || id) + '</span>';
+    const navItems = document.querySelectorAll('.nav-item');
+    navItems.forEach(item => {
+      if (item.getAttribute('onclick') && item.getAttribute('onclick').includes("'" + id + "'")) {
+        item.classList.add('active');
+      }
+    });
+    window.scrollTo(0, 0);
+    document.getElementById('main').scrollTop = 0;
+  }
+
+  function toggleCollapsible(id) {
+    const el = document.getElementById(id);
+    el.classList.toggle('open');
+  }
+
+  function expandAll() {
+    document.querySelectorAll('.collapsible').forEach(el => el.classList.add('open'));
+  }
+
+  function collapseAll() {
+    document.querySelectorAll('.collapsible').forEach(el => el.classList.remove('open'));
+  }
+
+  function markDone(exId, checked) {
+    done[exId] = checked;
+    const checkEl = document.getElementById('check-' + exId);
+    const navItem = checkEl ? checkEl.closest('.nav-item') : null;
+    if (checkEl) {
+      if (checked) {
+        checkEl.textContent = '✓';
+        if (navItem) navItem.classList.add('done');
+      } else {
+        checkEl.textContent = '✓';
+        if (navItem) navItem.classList.remove('done');
+      }
+    }
+    updateProgress();
+  }
+
+  function updateProgress() {
+    const total = EXERCISES.length;
+    const completed = EXERCISES.filter(id => done[id]).length;
+    const pct = Math.round((completed / total) * 100);
+    document.getElementById('progressFill').style.width = pct + '%';
+    document.getElementById('progressLabel').textContent = completed + ' of ' + total + ' exercises complete';
+  }
+
+  function copyCode(btn) {
+    const pre = btn.closest('.code-wrap').querySelector('pre');
+    const text = pre.innerText;
+    navigator.clipboard.writeText(text).then(() => {
+      btn.textContent = 'Copied!';
+      btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 1500);
+    });
+  }
+
+  // Syntax highlighting
+  document.addEventListener('DOMContentLoaded', () => {
+    hljs.highlightAll();
+  });
+</script>
+</body>
+</html>
