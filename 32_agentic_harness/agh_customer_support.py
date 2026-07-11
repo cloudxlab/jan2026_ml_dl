@@ -14,6 +14,8 @@ User's Question: {user_question}
 Here is the list of documents:
 {document_list}
 
+The directory that contains all files: {folder}
+
 You can do one of the following things only:
 
 1. Answer the user's question:
@@ -24,6 +26,9 @@ ASKUSER: <question>
 
 3. Read a file:
 READFILE: <filename.txt>
+
+4. List files/directory in a directory
+LISTDIR: <directory Name>
 
 Important:
 - Output only one line.
@@ -60,6 +65,8 @@ def parse_action(response: str):
 
     if response.startswith("READFILE:"):
         return "READFILE", response[len("READFILE:"):].strip()
+    if response.startswith("LISTDIR:"):
+        return "LISTDIR", os.listdir(response[len("LISTDIR:"):].strip())
 
     return "INVALID", response
 
@@ -67,6 +74,11 @@ def parse_action(response: str):
 def read_file(file_name):
     return open(file_name).read()
 
+def summarize_context(context):
+    prmpt = f'''
+        Summary the following context: {context}
+    '''
+    return llm_call(prmpt)
 
 def agentic_harness(
     user_question: str,
@@ -81,10 +93,13 @@ def agentic_harness(
         print(f"Step {step}")
         prompt = BASE_PROMPT_TEMPLATE.format(
             user_question=user_question,
-            document_list=document_list,
+            document_list=document_list, # document_list could be very big, shorten by using RAG
         )
-
+        
         if context:
+            if len(context) > .8 * max_prompt_size:
+                context = summarize_context(context)
+
             prompt += "\n\nContext so far:\n" + context
         
         print(f"Prompt: {prompt}")
@@ -105,7 +120,8 @@ def agentic_harness(
             filename = value.strip()
 
             try:
-                content_file = read_file(file_name=filename)
+                content_file = read_file(file_name=filename) # split the files
+
                 context += f"\nContent of {filename}:\n{content_file}"
             except:                
                 context += f"\nError: {filename} does not exist."
@@ -139,3 +155,14 @@ if __name__ == "__main__":
         )
         print("\nFINAL ANSWER:")
         print(answer)
+
+
+# Ideas
+# listdir 
+    Q: What if the list directory is too big?
+        - pagination
+# RAG:
+    - everytime automatically we find top 100 matching document descriptions
+    - Q: While we are doing the embedding, we find each document to be very huge?
+        We split into chunks - overlapping some content
+    
