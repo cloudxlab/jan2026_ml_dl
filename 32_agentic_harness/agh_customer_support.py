@@ -5,16 +5,8 @@ from openai import OpenAI
 
 client = OpenAI(api_key=OPENAI_API_KEY)
 
-
 BASE_PROMPT_TEMPLATE = """
 Answer the user's question.
-
-User's Question: {user_question}
-
-Here is the list of documents:
-{document_list}
-
-The directory that contains all files: {folder}
 
 You can do one of the following things only:
 
@@ -34,8 +26,15 @@ Important:
 - Output only one line.
 - Do not explain.
 - Do not use any format other than ANSWER, ASKUSER, or READFILE.
-"""
 
+User's Question: {user_question}
+
+Here is the list of documents:
+{document_list}
+
+The directory that contains all files: {folder}
+
+"""
 
 def build_document_list(documents: dict[str, str]) -> str:
     lines = []
@@ -162,7 +161,9 @@ if __name__ == "__main__":
     Q: What if the list directory is too big?
         - pagination
 # RAG:
-    - everytime automatically we find top 100 matching document descriptions
-    - Q: While we are doing the embedding, we find each document to be very huge?
-        We split into chunks - overlapping some content
-    
+    # - everytime automatically we find top 100 matching document descriptions
+    # - Q: While we are doing the embedding, we find each document to be very huge?
+        # We split into chunks - overlapping some content
+
+
+
