@@ -22,7 +22,11 @@ def normal_distribution(x, mean, sd):
 
 # Write a function that provides fraction of population given height
 # The sd is 1 and mean height is 5.7
+# Hint: f(5.7) will not give you the fraction but 0.01 * (f(5.7-.01)+f(5.7+.01))/2
+
 
 # Write a function that provide fraction of population between two heights?
 # pop_between_height(4, 5)
+# Hint: divide the entire population into slices of 0.01
 
+# also try finding the area of the curve between mu - 3*sd and mu + 3*sd
