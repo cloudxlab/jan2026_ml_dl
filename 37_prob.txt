@@ -1,0 +1,28 @@
+
+
+class Agent:
+    def solve(question):
+
+        for i in range(max_steps):
+            - AskUser
+            - Answer
+            - search_files(phrases)
+            - Read File
+            - execute_cmd()
+            # You can call a sub agent to solve specific separate problem. Create detailed sub_question with proper context required to solve that sub_question.
+            - call_agent(sub_question) 
+                newAgent = Agent()
+                context.append(newAgent.solve(sub_question))
+
+# Code https://en.wikipedia.org/wiki/Normal_distribution
+
+def normal_distribution(x, mean, sd):
+    return prob
+
+
+# Write a function that provides fraction of population given height
+# The sd is 1 and mean height is 5.7
+
+# Write a function that provide fraction of population between two heights?
+# pop_between_height(4, 5)
+
