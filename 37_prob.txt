@@ -24,9 +24,52 @@ def normal_distribution(x, mean, sd):
 # The sd is 1 and mean height is 5.7
 # Hint: f(5.7) will not give you the fraction but 0.01 * (f(5.7-.01)+f(5.7+.01))/2
 
+---
 
 # Write a function that provide fraction of population between two heights?
 # pop_between_height(4, 5)
 # Hint: divide the entire population into slices of 0.01
+# Code numeric integration
 
 # also try finding the area of the curve between mu - 3*sd and mu + 3*sd
+
+You are given a normal distribution of heights with mean 5.6 and sd .7
+write code to compute fraction of population between two heights.
+
+# Given a dataset having house price, income, income category columns. create a function that does stratified sample on income category
+# Don't use sklearn, you can use numpy.
+
+def stratified_sample_split(test_set_fraction, X, category_column_name):
+    return X_test, X_train
+
+---------
+col1|       col2| col3 
+1   |       2   |   A 
+1.1 |       2.1 |   A 
+1   |       2   |   A 
+1.1 |       2.1 |   A 
+1   |       2   |   A 
+1.1 |       2.1 |   A 
+1   |       2   |   A 
+1.1 |       2.1 |   A 
+10  |       12  |   B
+11  |       13  |   B
+--
+splitting col3.
+stratified_sample_split(.5, X, "col3"):
+
+X_train  & X_test both would look like this
+1   |       2   |   A 
+1.1 |       2.1 |   A 
+1   |       2   |   A 
+1.1 |       2.1 |   A 
+10  |       12  |   B
+
+# Given a distribution having two columns, calculate correlation coefficient
+def corr(x1, x2):
+    return -ive, +ive, 0
+
+# Code Min/Max Scaling
+
+# Code Normalization
+
